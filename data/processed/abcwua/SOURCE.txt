@@ -1,0 +1,22 @@
+# CCR compliance-results curated table
+
+Curated: 2026-08-06
+File: data/raw/processed/CCR_Compliance_Results.csv
+Coverage: COMPLIANCE MONITORING RESULTS rows from ABCWUA CCR / Water Quality Report mailers, report years 2020–2025 (hand-processed from PDFs).
+
+## Local PDF sources
+
+- data/raw/abcwua/ABCWUA-CCR-2020.pdf
+- data/raw/abcwua/ABCWUA-CCR-2021.pdf
+- data/raw/abcwua/ABCWUA-CCR-2022.pdf
+- data/raw/abcwua/ABCWUA-CCR-2023.pdf
+- data/raw/abcwua/ABCWUA-CCR-2024.pdf
+- data/raw/abcwua/ABCWUA-CCR-2025.pdf
+
+Upstream download URLs and fetch dates: data/raw/abcwua/SOURCE.txt
+
+## Notes
+
+- Values were hand-verified / processed from the mailer PDFs (multi-column layout; not raw pdftotext).
+- PWS cited on the compliance tables: Albuquerque Water System, NM35-10701.
+- Spot-check gates for goldens: arsenic (all years) and nitrate (esp. 2024) — see GQ-T1 / GQ-T2.
