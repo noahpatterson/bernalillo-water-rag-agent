@@ -19,8 +19,9 @@ A public, docker-composed Streamlit app that answers Bernalillo County water que
 ## Decisions so far
 
 <!-- index — one line per closed ticket -->
+- [Catalog public data sources for priority themes](.scratch/bernalillo-water-qa/issues/01-data-source-inventory.md) — CCR/NMED/WQP for quality; ABCWUA ASR PDFs+AIS for Bear Canyon; ABCWUA GPCD (~125 CY2024) for per-capita; USGS basin levels later
 
-- **Minimal local Airflow pattern for this ingestion**: Official Airflow 3.3.0 docker-compose (Celery) as baseline; separate app Postgres/pgvector; thin DAG → project Python via `@task` + PostgresHook; LocalExecutor trim optional for RAM — see `research/airflow-local-compose.md`.
+- [Minimal local Airflow pattern for this ingestion](issues/02-airflow-local-compose.md) — Official Airflow 3.3.0 docker-compose (Celery) baseline; separate app Postgres/pgvector; thin DAG → `@task` + PostgresHook ([findings](../../research/airflow-local-compose.md))
 
 ## Not yet specified
 
