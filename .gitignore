@@ -1,0 +1,36 @@
+.scratch/**/issues/*.resolved.md
+
+# env (keep .env.example)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.uv/
+
+# node / pnpm
+.pnpm-store/
+node_modules/
+.pnpm-debug.log*
+
+# next / build
+.next/
+out/
+dist/
+build/
+
+# local runtime / artifacts
+.DS_Store
+.airflow/
+logs/
+models/
+*.pem
+.vercel
