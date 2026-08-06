@@ -34,3 +34,7 @@ logs/
 models/
 *.pem
 .vercel
+
+# raw CCR PDFs (fetch with: uv run python scripts/download_raw_ccr.py)
+data/raw/**/*.pdf
+data/raw/processed/

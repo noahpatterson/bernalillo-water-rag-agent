@@ -1,10 +1,12 @@
 # CCR compliance-results curated table
 
 Curated: 2026-08-06
-File: data/raw/processed/CCR_Compliance_Results.csv
+File: data/processed/abcwua/CCR_Compliance_Results.csv
 Coverage: COMPLIANCE MONITORING RESULTS rows from ABCWUA CCR / Water Quality Report mailers, report years 2020–2025 (hand-processed from PDFs).
 
 ## Local PDF sources
+
+Download (not committed): `uv run python scripts/download_raw_ccr.py`
 
 - data/raw/abcwua/ABCWUA-CCR-2020.pdf
 - data/raw/abcwua/ABCWUA-CCR-2021.pdf
@@ -13,7 +15,7 @@ Coverage: COMPLIANCE MONITORING RESULTS rows from ABCWUA CCR / Water Quality Rep
 - data/raw/abcwua/ABCWUA-CCR-2024.pdf
 - data/raw/abcwua/ABCWUA-CCR-2025.pdf
 
-Upstream download URLs and fetch dates: data/raw/abcwua/SOURCE.txt
+Upstream URLs: data/raw/abcwua/SOURCE.txt
 
 ## Notes
 

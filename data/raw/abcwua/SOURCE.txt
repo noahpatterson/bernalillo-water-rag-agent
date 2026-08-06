@@ -1,0 +1,15 @@
+# ABCWUA CCR PDF sources (not committed — download locally)
+
+Fetch with:
+  uv run python scripts/download_raw_ccr.py
+
+Local files land in this directory as ABCWUA-CCR-YYYY.pdf.
+
+## Upstream URLs (fetched 8/6/26)
+
+- ABCWUA-CCR-2025.pdf ← https://www.abcwua.org/wp-content/uploads/2026/05/ABCWUA-2025WaterQualityMailerWeb.pdf
+- ABCWUA-CCR-2024.pdf ← https://www.abcwua.org/wp-content/uploads/2025/04/ABCWUA-2024WaterQualityMailerWeb-FINAL2.pdf
+- ABCWUA-CCR-2023.pdf ← https://www.abcwua.org/wp-content/uploads/2024/04/ABCWUA-2023WaterQualityMailerWeb.pdf
+- ABCWUA-CCR-2022.pdf ← https://www.abcwua.org/wp-content/uploads/2023/05/2022WaterQualityMailerWeb.pdf
+- ABCWUA-CCR-2021.pdf ← https://www.abcwua.org/wp-content/uploads/2022/05/ABCWUA-2021WaterQualityReport_Web_FINAL.pdf
+- ABCWUA-CCR-2020.pdf ← https://www.abcwua.org/wp-content/uploads/2021/05/ABCWUA-2021WaterQualityMailerWeb.pdf
