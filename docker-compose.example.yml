@@ -1,0 +1,68 @@
+# Full stack for a fresh setup. Usage:
+#   docker compose -f docker-compose.example.yml up --build
+#
+# If you already have postgres/grafana running on the `monitoring` network,
+# use docker-compose.yml instead (streamlit only).
+
+configs:
+  grafana-datasource:
+    content: |
+      apiVersion: 1
+      datasources:
+        - name: PostgreSQL
+          type: grafana-postgresql-datasource
+          uid: ffte4jq2c6dxca
+          access: proxy
+          # Docker network: Postgres listens on 5432 inside the container
+          url: postgres:5432
+          database: ${POSTGRES_DB}
+          user: ${POSTGRES_USER}
+          isDefault: true
+          editable: true
+          jsonData:
+            sslmode: disable
+            postgresVersion: 1700
+          secureJsonData:
+            password: ${POSTGRES_PASSWORD}
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - '${POSTGRES_PORT}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      # Host 3001 → Grafana's default HTTP port 3000
+      - '3001:3000'
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    configs:
+      - source: grafana-datasource
+        target: /etc/grafana/provisioning/datasources/postgres.yml
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  grafana_data:

@@ -1,0 +1,14 @@
+[project]
+name = "bernalillo-water-rag"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dotenv>=0.9.9",
+    "onnxruntime>=1.28.0",
+    "pandas>=3.0.5",
+    "psycopg[binary]>=3.3.4",
+    "pymupdf>=1.28.0",
+    "sentence-transformers>=5.7.0",
+]

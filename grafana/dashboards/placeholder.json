@@ -1,0 +1,45 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "grafana dashboard goes here",
+        "mode": "markdown"
+      },
+      "title": "",
+      "type": "text"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["placeholder"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Bernalillo Water RAG",
+  "uid": "bernalillo-placeholder",
+  "version": 1
+}
