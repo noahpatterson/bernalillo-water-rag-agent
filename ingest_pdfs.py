@@ -96,5 +96,12 @@ def ingest_pdf(connection: psycopg.Connection, pdf_path: str, year: int, url: st
 
 if __name__ == "__main__":
   connection = create_connection()
-  ingest_pdf(connection, "data/raw/abcwua/ABCWUA-CCR-2020.pdf", 2020, "https://www.abcwua.org/wp-content/uploads/2021/05/ABCWUA-2021WaterQualityMailerWeb.pdf")
+  # read SOURCE.txt and ingest each pdf
+  with open("data/raw/abcwua/SOURCE.txt", "r") as f:
+    for line in f:
+      if line.startswith("-"):
+        pdf_name, url = line.strip().removeprefix("- ").split(" ← ", 1)
+        full_pdf_path = os.path.join("data/raw/abcwua", pdf_name)
+        year = int(pdf_name.removesuffix(".pdf").rsplit("-", 1)[-1])
+        ingest_pdf(connection, full_pdf_path, year, url)
   connection.close()
