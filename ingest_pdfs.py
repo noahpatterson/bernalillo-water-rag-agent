@@ -1,10 +1,10 @@
 import datetime
-import json
 import psycopg
 import pymupdf4llm
 from utils.utils import create_connection
 import os
 from embedder import Embedder
+from tokenizers import Tokenizer
 
 def read_pdf_to_json(pdf_path: str) -> dict:
   return pymupdf4llm.to_json(pdf_path)
@@ -41,6 +41,21 @@ def read_pdf_to_chunks(pdf_path: str, year: int, url: str) -> list[dict]:
     cleaned_chunk = append_metadata_to_chunk(cleaned_chunk, year, url, chunk_id)
     yield cleaned_chunk
 
+def calc_overlap(chunk_size: int, overlap_percentage: int):
+  return int(chunk_size * overlap_percentage / 100)
+
+def split_to_smaller_chunks(chunk: dict, tokenizer: Tokenizer, chunk_size: int = 120, overlap_percentage: int = 10):
+    ids = tokenizer.encode(chunk["text"]).ids
+    overlap = calc_overlap(chunk_size, overlap_percentage)
+    step = chunk_size - overlap
+    if step <= 0:
+        raise ValueError("overlap must be < chunk_size")
+
+    for start in range(0, len(ids), step):
+        window = ids[start : start + chunk_size]
+        text = tokenizer.decode(window)
+        yield text
+    
 
 MIN_CHUNK_CHARS = 100
 
@@ -51,7 +66,7 @@ def insert_chunk(
   section: str,
   source_url: str,
   text: str,
-  embedding: list[float],
+  embedding,
 ) -> None:
   connection.execute(
     """
@@ -63,6 +78,8 @@ def insert_chunk(
   )
 
 def ingest_pdf(connection: psycopg.Connection, pdf_path: str, year: int, url: str) -> None:
+  tokenizer = Tokenizer.from_file("models/Xenova/all-MiniLM-L6-v2/tokenizer.json")
+  tokenizer.no_truncation() # no truncation, we want to split the text into smaller chunks
   chunks = list(read_pdf_to_chunks(pdf_path, year, url))
   connection.execute(
     "DELETE FROM knowledge_base_chunks WHERE report_year = %s",
@@ -73,15 +90,17 @@ def ingest_pdf(connection: psycopg.Connection, pdf_path: str, year: int, url: st
     text = chunk["text"].strip()
     if len(text) < MIN_CHUNK_CHARS:
       continue
+    chunk["text"] = text
     meta = chunk["metadata"]
-    insert_chunk(
-      connection,
-      year=meta["year"],
-      section=f"page_{meta['page_number']}",
-      source_url=meta["url"],
-      text=text,
-      embedding=embedder.encode(text).tolist(),
-    )
+    for i, smaller_chunk in enumerate(split_to_smaller_chunks(chunk, tokenizer)):
+      insert_chunk(
+        connection,
+        year=meta["year"],
+        section=f"page_{meta['page_number']}_chunk_{i}",
+        source_url=meta["url"],
+        text=smaller_chunk,
+        embedding=embedder.encode(smaller_chunk),
+      )
 
   stub_text = f"{year} COMPLIANCE MONITORING RESULTS — use compliance tool"
   insert_chunk(
@@ -90,7 +109,7 @@ def ingest_pdf(connection: psycopg.Connection, pdf_path: str, year: int, url: st
     section="compliance_monitoring_results",
     source_url=url,
     text=stub_text,
-    embedding=embedder.encode(stub_text).tolist(),
+    embedding=embedder.encode(stub_text),
   )
   connection.commit()
 
