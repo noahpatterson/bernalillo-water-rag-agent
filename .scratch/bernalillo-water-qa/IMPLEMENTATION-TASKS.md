@@ -34,11 +34,11 @@ Locked decisions live in [map.md](map.md). You implement; agent may scaffold/rev
 
 ## 3. Ingest: CCR knowledge base
 
-- [ ] `pymupdf` extract text from each CCR PDF
-- [ ] Strip COMPLIANCE MONITORING RESULTS table bodies; keep **year stub** chunks
-- [ ] Section-aware chunking (~400–800 tokens, ~10–15% overlap); metadata: year, section, URL, chunk id
-- [ ] Embed with local MiniLM ONNX; write pgvector + FTS columns
-- [ ] Smoke: retrieve GQ-K1 / GQ-K2 style queries return sensible chunks
+- [x] `pymupdf` / `pymupdf4llm` extract text from CCR PDFs (`ingest_pdfs.py`; start with 2020, same path for 2021–2025)
+- [x] Strip COMPLIANCE MONITORING RESULTS table bodies; keep **year stub** chunks
+- [x] Page-based chunking (CCR mailer layout not heading-friendly); metadata: year, section=`page_N`, URL; skip near-empty pages
+- [x] Embed with local MiniLM ONNX; write pgvector + generated FTS `tsv`
+- [x] Smoke: GQ-K1 / GQ-K2 vector retrieval returns sensible 2020 chunks (`page_4` / `page_2`)
 
 ## 4. Retrieval stack (implement + compare)
 

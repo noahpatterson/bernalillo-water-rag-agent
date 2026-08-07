@@ -41,7 +41,7 @@ def main():
             section VARCHAR(255) NOT NULL,
             source_url VARCHAR(255) NOT NULL,
             text TEXT NOT NULL,
-            tsv TSVECTOR NOT NULL,
+            tsv TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', text)) STORED,
             embedding VECTOR(384) NOT NULL
         )
     """):
