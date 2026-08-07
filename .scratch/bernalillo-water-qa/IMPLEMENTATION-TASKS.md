@@ -28,9 +28,9 @@ Locked decisions live in [map.md](map.md). You implement; agent may scaffold/rev
 
 ## 2. Ingest: compliance tool data
 
-- [ ] Loader: CSV → `compliance_results` (idempotent upsert by report_year + contaminant)
-- [ ] Spot-check: arsenic 2020–2025 + nitrate 2024 match CSV/PDF
-- [ ] Tool function: `lookup_compliance(contaminant, report_year | year_range)` → rows + citation fields
+- [x] Loader: CSV → `compliance_results` (idempotent upsert by report_year + contaminant)
+- [x] Spot-check: arsenic 2020–2025 + nitrate 2024 match CSV/PDF
+- [x] Tool function: `lookup_compliance(contaminant, report_year | year_range)` → rows + citation fields
 
 ## 3. Ingest: CCR knowledge base
 
@@ -74,7 +74,7 @@ Locked decisions live in [map.md](map.md). You implement; agent may scaffold/rev
 - [ ] Auto checks (fields + citation IDs) + human narrative pass
 - [ ] Fail wrong-lane answers (µg/L from KB alone when tool should hit)
 
-## 7. Streamlit app
+## 7. next.js app with eve agent
 
 - [ ] Chat UI: ask → answer + citations
 - [ ] Tier toggle (DEV / STRONG) or `OPENAI_MODEL_TIER`
