@@ -1,20 +1,11 @@
 import psycopg
+from utils.utils import create_connection
 
-def create_connection():
-    try:
-        return psycopg.connect("postgresql://admin:admin@localhost:5432/bernalillo-water-quality")
-    except psycopg.OperationalError as e:
-        print(f"Error connecting to the database: {e}")
-        return None
 
-def check_table_exists(connection: psycopg.Connection, table_name: str):
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute(f"SELECT 1 FROM {table_name} LIMIT 1")
-        return True
-    except psycopg.Error as e:
-        print(f"Error checking if table exists: {e}")
-        return False
+def check_table_exists(connection: psycopg.Connection, table_name: str) -> bool:
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT to_regclass(%s) IS NOT NULL", (f"public.{table_name}",))
+        return bool(cursor.fetchone()[0])
 
 def create_table(connection: psycopg.Connection, table_name: str, sql: str, ):
     if check_table_exists(connection, table_name):
@@ -63,7 +54,7 @@ def main():
             report_year SMALLINT NOT NULL CHECK (report_year >= 1900),
             contaminant_code VARCHAR(255),
             contaminant_name VARCHAR(255) NOT NULL,
-            sample_year SMALLINT NOT NULL CHECK (sample_year >= 1900),
+            sample_year SMALLINT CHECK (sample_year >= 1900),
             sample_year_range VARCHAR(255),
             units VARCHAR(255),
             lower_detection_limit FLOAT,
@@ -79,7 +70,8 @@ def main():
             max_lraa FLOAT,
             num_samples_exceeding_action_level INT,
             ninetieth_percentile FLOAT,
-            action_level FLOAT
+            action_level FLOAT,
+            uses_treatment_technique BOOLEAN NOT NULL
         )
     """):
         print("Failed to create compliance results table")
