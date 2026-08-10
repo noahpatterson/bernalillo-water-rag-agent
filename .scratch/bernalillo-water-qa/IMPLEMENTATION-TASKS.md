@@ -44,7 +44,7 @@ Locked decisions live in [map.md](map.md). You implement; agent may scaffold/rev
 
 - [x] vector-only (pgvector)
 - [x] text-only (Postgres FTS)
-- [ ] hybrid + **RRF**
+- [x] hybrid + **RRF**
 - [ ] hybrid + **FlashRank** `ms-marco-MiniLM-L-12-v2` (top 20 → top 5)
 - [ ] **query rewrite** (OpenAI SDK, active DEV/STRONG tier) → hybrid
 - [ ] rewrite → hybrid + rerank
