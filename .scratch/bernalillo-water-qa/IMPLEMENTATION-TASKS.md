@@ -50,7 +50,7 @@ Locked decisions live in [map.md](map.md). You implement; agent may scaffold/rev
 - [ ] rewrite → hybrid + rerank
 - [ ] Local eval script → `docs/eval/retrieval.md` (hit_rate@5, MRR)
 - [ ] After chunk IDs exist: label **≥10** KB retrieval fixtures (start from GQ-K1/K2 + paraphrases)
-- [ ] Pick production retrieval stack from eval winner rule
+- [x] Pick production retrieval stack from eval winner rule
 
 ## 5. Generation flows
 
