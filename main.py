@@ -1,3 +1,4 @@
+import os
 from typing import Annotated
 
 from dotenv import load_dotenv
@@ -12,10 +13,10 @@ from utils.utils import ContaminantValueType, create_connection
 
 load_dotenv()
 
-embedder = Embedder()
+embedder = Embedder(
+    execution_provider=os.getenv("ONNX_EXECUTION_PROVIDER", "CPUExecutionProvider"),
+)
 connection = create_connection()
-# print(embedder.encode("Hello, world!"))
-
 
 class LookupComplianceParams(BaseModel):
     contaminant: str

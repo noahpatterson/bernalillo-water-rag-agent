@@ -26,6 +26,8 @@ node_modules/
 out/
 dist/
 build/
+.output/
+.eve/
 
 # local runtime / artifacts
 .DS_Store

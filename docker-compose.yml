@@ -90,6 +90,7 @@ services:
       - ./utils:/app/utils
       - ./tools:/app/tools
       - ./models:/app/models:ro
+      - ./.eve/.workflow-data:/app/.eve/.workflow-data
     depends_on:
       postgres:
         condition: service_healthy

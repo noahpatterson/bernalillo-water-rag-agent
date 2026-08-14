@@ -1,13 +1,22 @@
 from enum import StrEnum
+import os
 
 import psycopg
+from dotenv import load_dotenv
 from pgvector.psycopg import register_vector
+
+load_dotenv()
 
 
 def create_connection():
+    """Open a Postgres connection from POSTGRES_* env vars (defaults match local compose)."""
     try:
         connection = psycopg.connect(
-            "postgresql://admin:admin@localhost:5432/bernalillo-water-quality"
+            host=os.getenv("POSTGRES_HOST", "localhost"),
+            port=os.getenv("POSTGRES_PORT", "5432"),
+            dbname=os.getenv("POSTGRES_DB", "bernalillo-water-quality"),
+            user=os.getenv("POSTGRES_USER", "admin"),
+            password=os.getenv("POSTGRES_PASSWORD", "admin"),
         )
         register_vector(connection)
         return connection

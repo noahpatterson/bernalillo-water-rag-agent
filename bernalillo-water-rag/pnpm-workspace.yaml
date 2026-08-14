@@ -1,4 +1,0 @@
-allowBuilds:
-  unrs-resolver: false
-minimumReleaseAgeExclude:
-  - eve@0.31.0

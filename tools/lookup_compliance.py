@@ -43,8 +43,6 @@ class YearSQL:
     params: list[int]
 
 
-
-
 def _display_value(row: dict[str, Any], value_type: ContaminantValueType | None) -> dict[str, Any]:
     """Determine the display value for a given row and value type.
 
@@ -59,7 +57,6 @@ def _display_value(row: dict[str, Any], value_type: ContaminantValueType | None)
     if value_type is None or row.get(value_type.value) is None:
         return {value_type.value: row.get(value_type.value) for value_type in list(ContaminantValueType) if row.get(value_type.value) is not None}
     return {value_type.value: row.get(value_type.value)}
-
 
 
 def _citation_from_row(row: dict[str, Any], value_type: ContaminantValueType | None) -> ComplianceCitation:
