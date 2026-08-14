@@ -1,6 +1,8 @@
+import threading
+from pathlib import Path
+
 import numpy as np
 import onnxruntime as ort
-from pathlib import Path
 from tokenizers import Tokenizer
 
 
@@ -16,6 +18,7 @@ class Embedder:
                 str(onnx_path), providers=[execution_provider]
             )
             self.input_names = {inp.name for inp in self.session.get_inputs()}
+            self._encode_lock = threading.Lock()
         else:
             from sentence_transformers import SentenceTransformer
 
@@ -42,8 +45,10 @@ class Embedder:
         return self.model.encode(texts, **kwargs)
 
     def _encode_batch_onnx(self, texts, normalize=True):
-        self.tokenizer.enable_padding()
-        encoded = self.tokenizer.encode_batch(texts)
+        # HuggingFace tokenizers are not safe to mutate/encode from two threads at once.
+        with self._encode_lock:
+            self.tokenizer.enable_padding()
+            encoded = self.tokenizer.encode_batch(texts)
         feed = {}
         if "input_ids" in self.input_names:
             feed["input_ids"] = np.array([e.ids for e in encoded], dtype=np.int64)

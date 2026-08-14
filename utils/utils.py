@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from enum import StrEnum
 import os
 
@@ -23,6 +24,18 @@ def create_connection():
     except psycopg.OperationalError as e:
         print(f"Error connecting to the database: {e}")
         return None
+
+
+@contextmanager
+def get_connection():
+    """Yield a connection owned by the caller. FastAPI threadpool requests must not share one conn."""
+    connection = create_connection()
+    if connection is None:
+        raise RuntimeError("Could not connect to Postgres")
+    try:
+        yield connection
+    finally:
+        connection.close()
 
 class ContaminantValueType(StrEnum):
     AVG_SYSTEM = "avg_system"

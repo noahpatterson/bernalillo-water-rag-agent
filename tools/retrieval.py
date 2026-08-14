@@ -1,5 +1,4 @@
 import psycopg
-from pgvector.psycopg import register_vector
 from pydantic import BaseModel
 
 from embedder import Embedder
@@ -35,9 +34,9 @@ def search_hit_from_row(row: tuple) -> SearchHit:
 
 class Retrieval:
     def __init__(self, embedder: Embedder, connection: psycopg.Connection):
+        # Caller must register_vector (create_connection / get_connection already does).
         self.embedder = embedder
         self.connection = connection
-        register_vector(connection)
 
     def pgvector_search(self, query: str, num_results: int = 5) -> list[SearchHit]:
         query_vector = self.embedder.encode(query)

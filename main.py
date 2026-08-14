@@ -9,14 +9,13 @@ from embedder import Embedder
 from tools.retrieval import FusedHit, Retrieval
 from tools.lookup_compliance import lookup_compliance
 from tools.lookup_contaminant_info import contaminant_info
-from utils.utils import ContaminantValueType, create_connection
+from utils.utils import ContaminantValueType, get_connection
 
 load_dotenv()
 
 embedder = Embedder(
     execution_provider=os.getenv("ONNX_EXECUTION_PROVIDER", "CPUExecutionProvider"),
 )
-connection = create_connection()
 
 class LookupComplianceParams(BaseModel):
     contaminant: str
@@ -37,11 +36,11 @@ app = FastAPI()
     ),
 )
 async def run_lookup_compliance(request: Annotated[LookupComplianceParams, Query()]):
-    result = lookup_compliance(
-        connection=connection,
-        **request.model_dump(exclude_none=True),
-    )
-    return result
+    with get_connection() as connection:
+        return lookup_compliance(
+            connection=connection,
+            **request.model_dump(exclude_none=True),
+        )
 
 @app.get(
     "/lookup_contaminant_info",
@@ -52,11 +51,11 @@ async def run_lookup_compliance(request: Annotated[LookupComplianceParams, Query
     ),
 )
 def run_lookup_contaminant_info(contaminant: str):
-    result = contaminant_info(
-        connection=connection,
-        contaminant=contaminant,
-    )
-    return result
+    with get_connection() as connection:
+        return contaminant_info(
+            connection=connection,
+            contaminant=contaminant,
+        )
 
 @app.get(
     "/search",
@@ -68,11 +67,11 @@ def run_lookup_contaminant_info(contaminant: str):
     response_model=list[FusedHit],
 )
 def run_search(query: str) -> list[FusedHit]:
-    retrieval = Retrieval(embedder=embedder, connection=connection)
-    results_vec = retrieval.pgvector_search(query, num_results=20)
-    results_soft_fts = retrieval.pg_full_text_search_soft_match(query, num_results=20)
-    results = retrieval.new_rrf(results_vec, results_soft_fts, num_results=5)
-    return results
+    with get_connection() as connection:
+        retrieval = Retrieval(embedder=embedder, connection=connection)
+        results_vec = retrieval.pgvector_search(query, num_results=20)
+        results_soft_fts = retrieval.pg_full_text_search_soft_match(query, num_results=20)
+        return retrieval.new_rrf(results_vec, results_soft_fts, num_results=5)
 
 @app.get("/health", operation_id="health_check")
 def health_check():
