@@ -1,23 +1,24 @@
-from typing import Any
-
 import psycopg
 from psycopg.rows import DictRow, dict_row
 
 from utils.utils import create_connection
 
 
-def contaminant_info(contaminant: str, connection: psycopg.Connection | None = None,) -> list[DictRow]:
-  if not contaminant.strip():
-      return []
+def contaminant_info(
+    contaminant: str,
+    connection: psycopg.Connection | None = None,
+) -> list[DictRow]:
+    if not contaminant.strip():
+        return []
 
-  owns_connection = connection is None
-  if owns_connection:
-      connection = create_connection()
-      if connection is None:
-          raise RuntimeError("Could not connect to Postgres")
+    owns_connection = connection is None
+    if owns_connection:
+        connection = create_connection()
+        if connection is None:
+            raise RuntimeError("Could not connect to Postgres")
 
-  try:
-    sql = """
+    try:
+        sql = """
         SELECT
             contaminant_name,
             contaminant_code,
@@ -31,14 +32,15 @@ def contaminant_info(contaminant: str, connection: psycopg.Connection | None = N
         )
         LIMIT 1
     """
-    with connection.cursor(row_factory=dict_row) as cursor:
-        cursor.execute(sql, (contaminant.strip(), contaminant.strip()))
-        rows = list(cursor.fetchall())
-    return rows
+        with connection.cursor(row_factory=dict_row) as cursor:
+            cursor.execute(sql, (contaminant.strip(), contaminant.strip()))
+            rows = list(cursor.fetchall())
+        return rows
 
-  finally:
-      if owns_connection and connection is not None:
-          connection.close()
+    finally:
+        if owns_connection and connection is not None:
+            connection.close()
+
 
 def __main__():
     # smoke: empty
@@ -52,6 +54,7 @@ def __main__():
     # smoke: unknown contaminant
     rows = contaminant_info("Gold")
     print(rows)
+
 
 if __name__ == "__main__":
     __main__()

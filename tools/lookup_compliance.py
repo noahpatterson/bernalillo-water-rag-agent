@@ -29,6 +29,7 @@ class ComplianceCitation:
         row_id: The row ID of the citation.
         source_url: The URL of the source of the citation.
     """
+
     contaminant: str
     value: dict[str, Any]
     units: str | None
@@ -37,13 +38,16 @@ class ComplianceCitation:
     row_id: int
     source_url: str | None
 
+
 @dataclass(frozen=True)
 class YearSQL:
     sql: str
     params: list[int]
 
 
-def _display_value(row: dict[str, Any], value_type: ContaminantValueType | None) -> dict[str, Any]:
+def _display_value(
+    row: dict[str, Any], value_type: ContaminantValueType | None
+) -> dict[str, Any]:
     """Determine the display value for a given row and value type.
 
     Args:
@@ -55,11 +59,17 @@ def _display_value(row: dict[str, Any], value_type: ContaminantValueType | None)
         If no value is passed or 1 value is not found, returns all available values.
     """
     if value_type is None or row.get(value_type.value) is None:
-        return {value_type.value: row.get(value_type.value) for value_type in list(ContaminantValueType) if row.get(value_type.value) is not None}
+        return {
+            value_type.value: row.get(value_type.value)
+            for value_type in list(ContaminantValueType)
+            if row.get(value_type.value) is not None
+        }
     return {value_type.value: row.get(value_type.value)}
 
 
-def _citation_from_row(row: dict[str, Any], value_type: ContaminantValueType | None) -> ComplianceCitation:
+def _citation_from_row(
+    row: dict[str, Any], value_type: ContaminantValueType | None
+) -> ComplianceCitation:
     """Converts a row from the compliance database into a ComplianceCitation.
 
     Args:
@@ -111,7 +121,7 @@ def _year_clause(
     report_year: int | None,
     report_year_range: tuple[int, int] | None,
     sample_year: int | None,
-    sample_year_range: tuple[int, int] | None
+    sample_year_range: tuple[int, int] | None,
 ) -> YearSQL | None:
     """Build SQL year predicate. Exactly one year arg must be set."""
     modes = {
@@ -139,7 +149,8 @@ def _year_clause(
     range_start_sql, range_end_sql = _sample_range_bounds_sql()
     # sample_* filters: match sample_year column OR overlapping sample_year_range text
     if sample_year is not None:
-        return YearSQL(f"""
+        return YearSQL(
+            f"""
             (
                 sample_year = %s
                 OR (
@@ -147,11 +158,14 @@ def _year_clause(
                     AND ({range_end_sql}) >= %s
                 )
             )
-        """, [sample_year, sample_year, sample_year])
+        """,
+            [sample_year, sample_year, sample_year],
+        )
 
     start, end = sample_year_range  # type: ignore[misc]
     _validate_inclusive_range(start, end, "sample_year_range")
-    return YearSQL(f"""
+    return YearSQL(
+        f"""
         (
             sample_year BETWEEN %s AND %s
             OR (
@@ -159,7 +173,9 @@ def _year_clause(
                 AND ({range_end_sql}) >= %s
             )
         )
-    """, [start, end, end, start])
+    """,
+        [start, end, end, start],
+    )
 
 
 def lookup_compliance(
@@ -212,7 +228,9 @@ def lookup_compliance(
               {year_sql}
             ORDER BY report_year ASC, contaminant_name ASC, id ASC
         """
-        params = [contaminant.strip(), contaminant.strip()] + (year_clause.params if year_clause else [])
+        params = [contaminant.strip(), contaminant.strip()] + (
+            year_clause.params if year_clause else []
+        )
 
         with connection.cursor(row_factory=dict_row) as cursor:
             cursor.execute(sql, params)
@@ -234,13 +252,12 @@ def main() -> None:
     arsenic = lookup_compliance("arsenic", report_year_range=(2020, 2025))
     print(f"arsenic report 2020–2025: {len(arsenic['rows'])} rows")
     for cite in arsenic["citations"]:
-        print(
-            f"  {cite} "
-            f"(row_id={cite['row_id']})"
-        )
+        print(f"  {cite} " f"(row_id={cite['row_id']})")
 
     # nitrate via report year and value type = AVG_SYSTEM
-    nitrate = lookup_compliance("nitrate", report_year=2024, value_type=ContaminantValueType.AVG_SYSTEM)
+    nitrate = lookup_compliance(
+        "nitrate", report_year=2024, value_type=ContaminantValueType.AVG_SYSTEM
+    )
     print(f"nitrate report 2024: {len(nitrate['rows'])} rows")
     for cite in nitrate["citations"]:
         print(
@@ -249,7 +266,9 @@ def main() -> None:
         )
 
     # crypto via sample year and value type = AVG_SYSTEM
-    crypto = lookup_compliance("Cryptosporidium", sample_year=2016, value_type=ContaminantValueType.AVG_SYSTEM)
+    crypto = lookup_compliance(
+        "Cryptosporidium", sample_year=2016, value_type=ContaminantValueType.AVG_SYSTEM
+    )
     print(f"Cryptosporidium sample covering 2016: {len(crypto['rows'])} rows")
     for row in crypto["citations"]:
         print(
@@ -265,6 +284,7 @@ def main() -> None:
             f"  {cite['report_year']}: {cite['value']} {cite['units']} "
             f"(row_id={cite['row_id']})"
         )
+
 
 if __name__ == "__main__":
     main()

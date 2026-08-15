@@ -17,6 +17,7 @@ embedder = Embedder(
     execution_provider=os.getenv("ONNX_EXECUTION_PROVIDER", "CPUExecutionProvider"),
 )
 
+
 class LookupComplianceParams(BaseModel):
     contaminant: str
     report_year: int | None = Field(default=None, ge=2020, le=2025)
@@ -25,7 +26,9 @@ class LookupComplianceParams(BaseModel):
     sample_year_range: tuple[int, int] | None = None
     value_type: ContaminantValueType | None = None
 
+
 app = FastAPI()
+
 
 @app.get(
     "/lookup_compliance",
@@ -42,6 +45,7 @@ async def run_lookup_compliance(request: Annotated[LookupComplianceParams, Query
             **request.model_dump(exclude_none=True),
         )
 
+
 @app.get(
     "/lookup_contaminant_info",
     operation_id="lookup_contaminant_info",
@@ -57,6 +61,7 @@ def run_lookup_contaminant_info(contaminant: str):
             contaminant=contaminant,
         )
 
+
 @app.get(
     "/search",
     operation_id="search",
@@ -70,9 +75,12 @@ def run_search(query: str) -> list[FusedHit]:
     with get_connection() as connection:
         retrieval = Retrieval(embedder=embedder, connection=connection)
         results_vec = retrieval.pgvector_search(query, num_results=20)
-        results_soft_fts = retrieval.pg_full_text_search_soft_match(query, num_results=20)
+        results_soft_fts = retrieval.pg_full_text_search_soft_match(
+            query, num_results=20
+        )
         return retrieval.new_rrf(results_vec, results_soft_fts, num_results=5)
+
 
 @app.get("/health", operation_id="health_check")
 def health_check():
-  return {"status": "healthy"}
+    return {"status": "healthy"}

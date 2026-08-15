@@ -7,7 +7,11 @@ from tokenizers import Tokenizer
 
 
 class Embedder:
-    def __init__(self, path="models/Xenova/all-MiniLM-L6-v2", execution_provider="CPUExecutionProvider"):
+    def __init__(
+        self,
+        path="models/Xenova/all-MiniLM-L6-v2",
+        execution_provider="CPUExecutionProvider",
+    ):
         path = Path(path)
         onnx_path = path / "model.onnx"
 
@@ -26,9 +30,9 @@ class Embedder:
             self.model = SentenceTransformer(str(path))
 
     def encode(self, text, normalize=True, prompt_name=None):
-        return self.encode_batch(
-            [text], normalize=normalize, prompt_name=prompt_name
-        )[0]
+        return self.encode_batch([text], normalize=normalize, prompt_name=prompt_name)[
+            0
+        ]
 
     def encode_batch(self, texts, normalize=True, prompt_name=None):
         if self._backend == "onnx":

@@ -7,21 +7,26 @@ def check_table_exists(connection: psycopg.Connection, table_name: str) -> bool:
         cursor.execute("SELECT to_regclass(%s) IS NOT NULL", (f"public.{table_name}",))
         return bool(cursor.fetchone()[0])
 
-def create_table(connection: psycopg.Connection, table_name: str, sql: str, ):
+
+def create_table(
+    connection: psycopg.Connection,
+    table_name: str,
+    sql: str,
+):
     if check_table_exists(connection, table_name):
         print(f"Table {table_name} already exists")
         return True
     else:
-      try:
-          with connection.cursor() as cursor:
-              cursor.execute(sql)
-          connection.commit()
-          print("Table created successfully")
-          return True
-      except psycopg.Error as e:
-          connection.rollback()
-          print(f"Error creating table: {e}")
-          return None
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(sql)
+            connection.commit()
+            print("Table created successfully")
+            return True
+        except psycopg.Error as e:
+            connection.rollback()
+            print(f"Error creating table: {e}")
+            return None
 
 
 def main():
@@ -33,7 +38,10 @@ def main():
         return
 
     # Create knowledge base chunks table
-    if not create_table(connection, "knowledge_base_chunks", """
+    if not create_table(
+        connection,
+        "knowledge_base_chunks",
+        """
         CREATE TABLE IF NOT EXISTS knowledge_base_chunks (
             id SERIAL PRIMARY KEY,
             ingested_date TIMESTAMP NOT NULL,
@@ -44,11 +52,15 @@ def main():
             tsv TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', text)) STORED,
             embedding VECTOR(384) NOT NULL
         )
-    """):
+    """,
+    ):
         print("Failed to create knowledge base chunks table")
 
     # create compliance_results table
-    if not create_table(connection, "compliance_results", """
+    if not create_table(
+        connection,
+        "compliance_results",
+        """
         CREATE TABLE IF NOT EXISTS compliance_results (
             id SERIAL PRIMARY KEY,
             report_year SMALLINT NOT NULL CHECK (report_year >= 1900),
@@ -73,10 +85,12 @@ def main():
             action_level FLOAT,
             uses_treatment_technique BOOLEAN NOT NULL
         )
-    """):
+    """,
+    ):
         print("Failed to create compliance results table")
 
     connection.close()
+
 
 if __name__ == "__main__":
     main()

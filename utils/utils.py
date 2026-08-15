@@ -37,6 +37,7 @@ def get_connection():
     finally:
         connection.close()
 
+
 class ContaminantValueType(StrEnum):
     AVG_SYSTEM = "avg_system"
     NINETIETH_PERCENTILE = "ninetieth_percentile"
@@ -51,16 +52,17 @@ class ContaminantValueType(StrEnum):
     NUM_SAMPLES_EXCEEDING_ACTION_LEVEL = "num_samples_exceeding_action_level"
     ACTION_LEVEL = "action_level"
 
+
 class ContaminantValueDescriptions(StrEnum):
-  AVG_SYSTEM = "Average detected system wide"
-  NINETIETH_PERCENTILE = "Ninetieth percentile"
-  MAX_LRAA = "Max LRAA"
-  LOWER_DETECTION_LIMIT = "Lower detection limit"
-  UPPER_DETECTION_LIMIT = "Upper detection limit"
-  MIN_DETECTED = "Minimum detected"
-  MAX_DETECTED = "Maximum detected"
-  AVERAGE_SAN_JUAN = "Average Detected at San Juan-Chama Drinking Water Plant"
-  MAXIMUM_CONTAMINANT_LEVEL = "Maximum contaminant level"
-  MAXIMUM_CONTAMINANT_LEVEL_GOAL = "Maximum contaminant level goal"
-  NUM_SAMPLES_EXCEEDING_ACTION_LEVEL = "Number of samples exceeding action level"
-  ACTION_LEVEL = "Action level"
+    AVG_SYSTEM = "Average detected system wide"
+    NINETIETH_PERCENTILE = "Ninetieth percentile"
+    MAX_LRAA = "Max LRAA"
+    LOWER_DETECTION_LIMIT = "Lower detection limit"
+    UPPER_DETECTION_LIMIT = "Upper detection limit"
+    MIN_DETECTED = "Minimum detected"
+    MAX_DETECTED = "Maximum detected"
+    AVERAGE_SAN_JUAN = "Average Detected at San Juan-Chama Drinking Water Plant"
+    MAXIMUM_CONTAMINANT_LEVEL = "Maximum contaminant level"
+    MAXIMUM_CONTAMINANT_LEVEL_GOAL = "Maximum contaminant level goal"
+    NUM_SAMPLES_EXCEEDING_ACTION_LEVEL = "Number of samples exceeding action level"
+    ACTION_LEVEL = "Action level"
