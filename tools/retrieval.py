@@ -38,69 +38,131 @@ class Retrieval:
         self.embedder = embedder
         self.connection = connection
 
-    def pgvector_search(self, query: str, num_results: int = 5) -> list[SearchHit]:
+    def pgvector_search(self, query: str, num_results: int = 5, report_year: int | None = None) -> list[SearchHit]:
         query_vector = self.embedder.encode(query)
-        rows = self.connection.execute(
-            """
-            SELECT
-              id,
-              report_year,
-              section,
-              source_url,
-              text,
-              embedding <=> %s AS retrieval_score
-            FROM knowledge_base_chunks
-            ORDER BY retrieval_score
-            LIMIT %s
-            """,
-            (query_vector, num_results),
-        ).fetchall()
+        if report_year:
+            rows = self.connection.execute(
+                """
+                SELECT
+                id,
+                report_year,
+                section,
+                source_url,
+                text,
+                embedding <=> %s AS retrieval_score
+                FROM knowledge_base_chunks
+                WHERE report_year = %s
+                ORDER BY retrieval_score
+                LIMIT %s
+                """,
+                (query_vector, report_year, num_results),
+            ).fetchall()
+        else:
+            rows = self.connection.execute(
+                """
+                SELECT
+                id,
+                report_year,
+                section,
+                source_url,
+                text,
+                embedding <=> %s AS retrieval_score
+                FROM knowledge_base_chunks
+                ORDER BY retrieval_score
+                LIMIT %s
+                """,
+                (query_vector, num_results),
+            ).fetchall()
         return [search_hit_from_row(row) for row in rows]
 
-    def pg_full_text_search(self, query: str, num_results: int = 5) -> list[SearchHit]:
-        rows = self.connection.execute(
-            """
-            SELECT
-              id,
-              report_year,
-              section,
-              source_url,
-              text,
-              ts_rank(tsv, plainto_tsquery('english', %s)) AS retrieval_score
-            FROM knowledge_base_chunks
-            WHERE tsv @@ plainto_tsquery('english', %s)
-            ORDER BY retrieval_score DESC
-            LIMIT %s
-            """,
-            (query, query, num_results),
-        ).fetchall()
+    def pg_full_text_search(self, query: str, num_results: int = 5, report_year: int | None = None) -> list[SearchHit]:
+        if report_year:
+            rows = self.connection.execute(
+                """
+                SELECT
+                    id,
+                    report_year,
+                    section,
+                    source_url,
+                    text,
+                    ts_rank(tsv, plainto_tsquery('english', %s)) AS retrieval_score
+                FROM knowledge_base_chunks
+                WHERE tsv @@ plainto_tsquery('english', %s)
+                AND report_year = %s
+                ORDER BY retrieval_score DESC
+                LIMIT %s
+                """,
+                (query, query, report_year, num_results),
+            ).fetchall()
+        else:
+            rows = self.connection.execute(
+                """
+                SELECT
+                id,
+                report_year,
+                section,
+                source_url,
+                text,
+                ts_rank(tsv, plainto_tsquery('english', %s)) AS retrieval_score
+                FROM knowledge_base_chunks
+                WHERE tsv @@ plainto_tsquery('english', %s)
+                ORDER BY retrieval_score DESC
+                LIMIT %s
+                """,
+                (query, query, num_results),
+            ).fetchall()
         return [search_hit_from_row(row) for row in rows]
 
-    def pg_full_text_search_soft_match(self, query: str, num_results: int = 5) -> list[SearchHit]:
+    def pg_full_text_search_soft_match(
+        self, query: str, num_results: int = 5, report_year: int | None = None
+    ) -> list[SearchHit]:
         """
         Soft keyword search (minsearch-like): match if *any* query term appears.
         plainto_tsquery builds AND (&); we flip to OR (|) so long NL questions still hit.
         """
-        rows = self.connection.execute(
-            """
-            SELECT
-              id,
-              report_year,
-              section,
-              source_url,
-              text,
-              ts_rank(tsv, query) AS retrieval_score
-            FROM knowledge_base_chunks,
-                 to_tsquery(
-                   'english',
-                   replace(plainto_tsquery('english', %s)::text, ' & ', ' | ')
-                 ) AS query
-            WHERE tsv @@ query
-            ORDER BY retrieval_score DESC
-            LIMIT %s
-            """,
-            (query, num_results),
-        ).fetchall()
+        if report_year:
+            rows = self.connection.execute(
+                """
+                SELECT
+                id,
+                report_year,
+                section,
+                source_url,
+                text,
+                ts_rank(tsv, query) AS retrieval_score
+                FROM knowledge_base_chunks,
+                    to_tsquery(
+                    'english',
+                    replace(plainto_tsquery('english', %s)::text, ' & ', ' | ')
+                    ) AS query
+                WHERE tsv @@ query
+                AND report_year = %s
+                ORDER BY retrieval_score DESC
+                LIMIT %s
+                """,
+                (query, report_year, num_results),
+            ).fetchall()
+        else:
+            rows = self.connection.execute(
+                """
+                SELECT
+                id,
+                report_year,
+                section,
+                source_url,
+                text,
+                ts_rank(tsv, query) AS retrieval_score
+                FROM knowledge_base_chunks,
+                    to_tsquery(
+                    'english',
+                    replace(plainto_tsquery('english', %s)::text, ' & ', ' | ')
+                    ) AS query
+                WHERE tsv @@ query
+                ORDER BY retrieval_score DESC
+                LIMIT %s
+                """,
+                (query, num_results),
+            ).fetchall()
         return [search_hit_from_row(row) for row in rows]
 
     def rrf(
@@ -139,34 +201,50 @@ class Retrieval:
             for i in ranked_ids[:num_results]
         ]
 
-
     def new_rrf(
-      self,
-      vectorHits: list[SearchHit],
-      textHits: list[SearchHit],
-      num_results: int = 5
+        self,
+        vectorHits: list[SearchHit],
+        textHits: list[SearchHit],
+        num_results: int = 5,
     ) -> list[FusedHit]:
-      """
-      My own RRF implementation -- not as clean as the AI assisted version
-      """
-      scores = {}
-      fused_hits = []
+        """
+        My own RRF implementation -- not as clean as the AI assisted version
+        """
+        scores = {}
+        fused_hits = []
 
-      for i, vecHit in enumerate(vectorHits):
-        score = 1 / (60 + i)
-        scores[vecHit.id] = {"hit": vecHit, "score": score, "vector_rank": i, "fts_rank": None}
+        for i, vecHit in enumerate(vectorHits):
+            score = 1 / (60 + i)
+            scores[vecHit.id] = {
+                "hit": vecHit,
+                "score": score,
+                "vector_rank": i,
+                "fts_rank": None,
+            }
 
-      for i, textHit in enumerate(textHits):
-        score = 1 / (60 + i)
-        if textHit.id in scores:
-          scores[textHit.id]["score"] += score
-          scores[textHit.id]["fts_rank"] = i
-        else:
-          scores[textHit.id] = {"hit": textHit, "score": score, "vector_rank": None, "fts_rank": i}
+        for i, textHit in enumerate(textHits):
+            score = 1 / (60 + i)
+            if textHit.id in scores:
+                scores[textHit.id]["score"] += score
+                scores[textHit.id]["fts_rank"] = i
+            else:
+                scores[textHit.id] = {
+                    "hit": textHit,
+                    "score": score,
+                    "vector_rank": None,
+                    "fts_rank": i,
+                }
 
-      for id, score in scores.items():
-        fused_hits.append(FusedHit(hit=score["hit"], rrf_score=score["score"], vector_rank=score["vector_rank"], fts_rank=score["fts_rank"]))
-      return sorted(fused_hits, key=lambda x: x.rrf_score, reverse=True)[:num_results]
+        for id, score in scores.items():
+            fused_hits.append(
+                FusedHit(
+                    hit=score["hit"],
+                    rrf_score=score["score"],
+                    vector_rank=score["vector_rank"],
+                    fts_rank=score["fts_rank"],
+                )
+            )
+        return sorted(fused_hits, key=lambda x: x.rrf_score, reverse=True)[:num_results]
 
 
 def main():
