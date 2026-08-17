@@ -24,6 +24,8 @@ This RAG tool lets a resident ask in plain language and get an answer grounded i
 - **Embeddings:** Xenova all-MiniLM-L6-v2 via ONNX Runtime
 - **Agent / UI:** Eve + Next.js chat; OpenAI for the LLM; tools via FastAPI OpenAPI
 - **Ingest:** PyMuPDF / pymupdf4llm for CCR PDFs; hand-curated compliance CSV
+- **Evals** Local and Eve Evals
+- **Monitoring** Arize AX with OpenTelemetry - managed by Eve framework
 - **Ops:** Docker Compose, uv, Ruff, Black
 
 ## Project prep
@@ -80,9 +82,9 @@ Place / download the Zoomcamp ONNX MiniLM under `models/` (gitignored). See `.en
 
 ### 5. Eve chat UI
 
-The browser chat is Eve's official Next.js Web Chat starter, colocated with the agent in `bernalillo-water-rag-agent/`. Compose builds and starts it on [http://localhost:3000](http://localhost:3000) with the rest of the stack. Set `OPENAI_API_KEY` in the repo-root `.env` before `docker compose up`.
+The browser chat is Eve's official Next.js Web Chat starter, colocated with the agent in `bernalillo-water-rag-agent/`. Compose builds and starts it on [http://localhost:3000](http://localhost:3000) with the rest of the stack. Set `OPENAI_API_KEY` in the repo-root `.env` before `docker compose up`. Arize tracing keys (`ARIZE_SPACE_ID`, `ARIZE_API_KEY`) live in `bernalillo-water-rag-agent/.env.local`.
 
-For live Next.js / Eve development on the host instead of the container, stop the compose `eve` service first (port 3000) and run:
+For local Next.js / Eve development instead of the container, stop the compose `eve` service first (port 3000) and run:
 
 ```bash
 cd bernalillo-water-rag-agent
@@ -238,6 +240,10 @@ uv run python -m ingestion.ingest_pdfs
 ```
 
 Reads `data/raw/abcwua/SOURCE.txt`, strips table boxes from each page, splits the remaining narrative, embeds with MiniLM, and writes `knowledge_base_chunks` (used by `/search`). Each report year is deleted and re-inserted. A short compliance stub is added so search can point at the compliance tool instead of the raw table text.
+
+## Monitoring
+
+I choose to use []() for monitoring as Eve allows for easy integration of OpenTelemetry data (traces, agent runs, etc.). In the future I hope to add a simple local example where I add Grafana as another example source for the Eve OpenTelemetry data.
 
 ## Containerization
 

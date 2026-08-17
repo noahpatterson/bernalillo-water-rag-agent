@@ -15,6 +15,11 @@ RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
 
+# eve build inlines connection URLs and auth flags. Set the compose-network
+# FastAPI origin and public-demo auth here, not only at container runtime.
+ENV KNOWLEDGE_API_BASE_URL=http://api.localhost:8000 \
+    EVE_ALLOW_ANONYMOUS=1
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm exec eve build && pnpm build
