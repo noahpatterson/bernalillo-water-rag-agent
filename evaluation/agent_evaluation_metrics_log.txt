@@ -1,0 +1,7 @@
+run_date=2026-08-17T13:17:58-06:00
+eve_model=gpt-5.4-mini
+judge_model=gpt-5.4-mini
+relevance
+RELEVANT           0.7
+PARTLY_RELEVANT    0.3
+

@@ -1,0 +1,66 @@
+run_date,eve_model,judge_model,id,question,answer_llm,session_id,relevance,explanation
+2026-08-17T13:17:58-06:00,gpt-5.4-mini,gpt-5.4-mini,159,Does Albuquerque drinking water meet federal safety standards?,"Yes. The Albuquerque Water Authority reports say the drinking water is tested against EPA limits and the listed regulated contaminants for 2020–2025 are at or below their federal standards in the available report data.
+
+Examples from the reports:
+- **Turbidity** stayed below the MCL of 1 NTU in each year shown.
+- **Total Coliform** stayed below the MCL of 5%.
+- **Gross Alpha Particle Activity** was well below its MCL of 15 pCi/L.
+- **2025** also shows **E. coli** below its MCL of 1%.
+
+Source: https://www.abcwua.org/wp-content/uploads/2026/05/ABCWUA-2025WaterQualityMailerWeb.pdf
+
+If you want, I can also summarize a specific year’s compliance results in more detail.",wrun_01M08JF2AJK3GEY03G93KJ7A2E,RELEVANT,The answer directly addresses whether Albuquerque drinking water meets federal safety standards and supports the claim with compliance-related details from the water quality reports. It stays on topic and provides evidence of meeting EPA limits.
+2026-08-17T13:17:58-06:00,gpt-5.4-mini,gpt-5.4-mini,159,Is the 2025 report saying our tap water outperforms EPA standards?,"Yes — the 2025 report says the water is “outperforming all federal standards for safe drinking water,” and the compliance data shown for 2025 is consistent with that claim: listed measured values are at or below the EPA limits shown in the report.
+
+Examples from the 2025 compliance table:
+- E. coli: max detected 0.41% vs MCL 1%
+- Total Coliform: max detected 0.41% vs MCL 5%
+- Turbidity: max detected 0.11 NTU vs MCL 1
+- Total Organic Carbon: reported, with treatment technique shown
+- Several PFAS compounds: detected at 0 in the report table
+
+Source: https://www.abcwua.org/wp-content/uploads/2026/05/ABCWUA-2025WaterQualityMailerWeb.pdf",wrun_01M08JFCAANB9BYX8ZY97W3V86,RELEVANT,The generated answer directly addresses the question by stating that the 2025 report says the tap water is outperforming federal/EPA standards and supports that with specific compliance-table examples. It is on-topic and answers the question clearly.
+2026-08-17T13:17:58-06:00,gpt-5.4-mini,gpt-5.4-mini,161,How does ABCWUA treat groundwater before it gets to my tap?,"ABCWUA customers rely on locally pumped groundwater plus surface water imported from upstream reservoirs. The report material I found does **not** give a detailed, step-by-step description of specific groundwater treatment processes before water reaches the tap.
+
+What it does say is that ABCWUA:
+- supplies water from **locally pumped groundwater**
+- uses a **surface water treatment plant** for surface water
+- performs **testing** at customer taps and at the treatment plant
+- conducts **source water assessments** to evaluate susceptibility to contamination
+
+Source: https://www.abcwua.org/wp-content/uploads/2023/05/2022WaterQualityMailerWeb.pdf
+
+I couldn’t answer with more detail because the available report text doesn’t describe the groundwater treatment process itself.",wrun_01M08JFK2R6YJSXSQ3N684DNM5,PARTLY_RELEVANT,"The answer is related to ABCWUA water sourcing and mentions groundwater, but it does not explain how the groundwater is treated before reaching the tap, which is the core of the question. It mainly states that the source text lacks details and provides only general context."
+2026-08-17T13:17:58-06:00,gpt-5.4-mini,gpt-5.4-mini,161,Do they extra-filter well water for arsenic?,"Yes—according to the Albuquerque Water Quality reports, groundwater “requires little treatment other than disinfection via chlorination, and in some cases undergoes additional filtering for arsenic removal.” So the answer is: sometimes, yes.
+
+The reports also say all Albuquerque drinking water meets EPA standards for arsenic, and arsenic can occur in some locations due to erosion of natural deposits.
+
+Source:
+- https://www.abcwua.org/wp-content/uploads/2022/05/ABCWUA-2021WaterQualityReport_Web_FINAL.pdf
+- https://www.abcwua.org/wp-content/uploads/2021/05/ABCWUA-2021WaterQualityMailerWeb.pdf",wrun_01M08JFRJRSSXP7BVMR1YS34JS,RELEVANT,"The answer directly addresses the question by stating that well water is sometimes additionally filtered for arsenic, which is the core of the user's query. It also provides supporting context from the cited water quality reports."
+2026-08-17T13:17:58-06:00,gpt-5.4-mini,gpt-5.4-mini,161,Why does river water need more treatment than groundwater?,"River water needs more treatment because it is **surface water**, which is more exposed to contamination and therefore requires **extensive purification before distribution**. The report says groundwater generally needs **little treatment other than chlorination**, and sometimes additional filtering for arsenic removal, while surface water undergoes a **series of mechanical and chemical processes** to make it safe, including steps that **destroy bacteria and viruses**.
+
+Source: https://www.abcwua.org/wp-content/uploads/2025/04/ABCWUA-2024WaterQualityMailerWeb-FINAL2.pdf
+
+I answered using the Albuquerque Water quality report’s description of how drinking water is made safe.",wrun_01M08JFXA490BAQM1WF3TEBCM9,RELEVANT,"The answer directly addresses why river water needs more treatment than groundwater: river water is surface water, more exposed to contamination, while groundwater generally needs less treatment. It explains the contrast using treatment steps and contaminants, which is responsive to the question."
+2026-08-17T13:17:58-06:00,gpt-5.4-mini,gpt-5.4-mini,161,How is water treated at the San Juan-Chama plant?,"At the San Juan-Chama Drinking Water Project surface-water treatment plant, water undergoes extensive purification using a series of mechanical and chemical processes. The report says treatment includes chemical stabilization for corrosion prevention, and the treatment processes destroy bacteria and viruses.
+
+Source: https://www.abcwua.org/wp-content/uploads/2025/04/ABCWUA-2024WaterQualityMailerWeb-FINAL2.pdf",wrun_01M08JG490DGZNHYRFEX00JAKV,RELEVANT,"The generated answer directly addresses how water is treated at the San Juan-Chama plant by describing the treatment process as a surface-water treatment operation involving purification, chemical stabilization for corrosion prevention, and disinfection that destroys bacteria and viruses."
+2026-08-17T13:17:58-06:00,gpt-5.4-mini,gpt-5.4-mini,161,What is chemical stabilization for in the treatment process?,"Chemical stabilization is used for **corrosion prevention** in the treatment process. The report says treatment, including chemical stabilization, occurs at the San Juan-Chama drinking water project surface-water treatment plant, and the treatment processes destroy bacteria and viruses.
+
+Source: https://www.abcwua.org/wp-content/uploads/2024/04/ABCWUA-2023WaterQualityMailerWeb.pdf",wrun_01M08JG8VN8EX9R165RS24MDXH,PARTLY_RELEVANT,"The answer addresses chemical stabilization as being used for corrosion prevention, which is likely related to the treatment process. However, it adds unrelated details about bacteria and viruses and does not clearly and directly explain the role of chemical stabilization in the treatment process beyond corrosion prevention."
+2026-08-17T13:17:58-06:00,gpt-5.4-mini,gpt-5.4-mini,162,Is Heron Reservoir part of how water gets to Albuquerque?,"Yes. The Albuquerque Water Authority reports show Heron Reservoir as part of the imported surface-water supply that gets combined with groundwater for distribution to Albuquerque and Bernalillo County.
+
+Source: https://www.abcwua.org/wp-content/uploads/2023/05/2022WaterQualityMailerWeb.pdf
+
+I didn’t use contaminant data because this question was about the water supply system, not a contaminant or compliance measurement.",wrun_01M08JGGKEV9F7T49DB1C5Q238,RELEVANT,The answer directly addresses the question by stating that Heron Reservoir is part of the imported surface-water supply used for Albuquerque's water system. It stays on topic and provides a clear yes/no response with supporting context.
+2026-08-17T13:17:58-06:00,gpt-5.4-mini,gpt-5.4-mini,162,Does the San Juan-Chama project run through New Mexico and Colorado?,"The report text says the San Juan-Chama project imports surface water from the Colorado River Basin via the San Juan-Chama project, but it does not say that the project itself runs through both New Mexico and Colorado.
+
+So, based on the report:
+- It is associated with water imported from the Colorado River Basin.
+- I can’t confirm from the report that the project “runs through” both states.
+
+Source: https://www.abcwua.org/wp-content/uploads/2025/04/ABCWUA-2024WaterQualityMailerWeb-FINAL2.pdf",wrun_01M08JGNA2BHWN0E2WGCM57W13,PARTLY_RELEVANT,"The answer addresses the San Juan-Chama project and correctly notes uncertainty about whether it runs through both New Mexico and Colorado, but it does not directly answer the question. It shifts focus to water imports from the Colorado River Basin rather than confirming the project's geographic route."
+2026-08-17T13:17:58-06:00,gpt-5.4-mini,gpt-5.4-mini,164,How many water samples does ABCWUA test each year?,"ABCWUA says it collects and tests **more than 5,500 water samples each year** from wells, storage tanks, customer taps, and the surface water treatment plant.
+
+Source: https://www.abcwua.org/wp-content/uploads/2025/04/ABCWUA-2024WaterQualityMailerWeb-FINAL2.pdf",wrun_01M08JGSFGHGQQ53GN58YYP23K,RELEVANT,"The generated answer directly addresses the question by stating the number of water samples ABCWUA tests each year: more than 5,500. This matches the requested information."

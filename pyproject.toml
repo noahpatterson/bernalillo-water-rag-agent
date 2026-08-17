@@ -15,6 +15,7 @@ dependencies = [
     "pydantic>=2.13.4",
     "pymupdf>=1.28.0",
     "pymupdf4llm>=1.28.0",
+    "requests>=2.34.2",
     "sentence-transformers>=5.7.0",
     "tqdm>=4.70.0",
 ]

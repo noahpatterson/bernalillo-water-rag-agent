@@ -130,7 +130,66 @@ run_date,method,report_year,hit_rate,mrr
 
 ## LLM evaluation
 
-Placeholder
+There are two types of LLM evaluation I created for this project:
+
+### 1. Simple LLM-As-A-Judge
+
+The simple llm-as-a-judge takes existing `ground_truth` data (without llm generated answers) and creates new answers via the project's Eve API. Then it runs a simple evaluation through a standard OpenAI call and expects a judge in the following format `'NON_RELEVANT' | 'PARTLY_RELEVANT' | 'RELEVANT',`. 
+
+There's a helpful script to run these simple evaluations:
+
+```bash
+uv run python -m evaluation.agent_evaluation_simple \
+  --eve-model gpt-5.4-mini \
+  --judge-model gpt-5.4-mini \
+  --sample-size 10 \
+  --eve-host http://127.0.0.1:3000
+
+// Optional paths: --ground-truth-path, --data-path, --results-path. 
+```
+
+What it does:
+1. The script either uses default variables from main, or specific args you pass
+2. NOTE: you'll likely need to pass the Eve server url that starts when you run `pnpm run dev` to `--eve-host`
+3. NOTE: If you've changed the defaut Eve model in .env `OPENAI_MODEL_DEV` pass `--eve-model` with your model.
+4. It uses the specific Eve Model and Judge Model you pass.
+5. If the script sees an existing Eve generated evaluation data file e.g. `evaluation/agent_evaluation_data_gpt_5_4_mini.csv` then it skips re-creating those Eve answers. Delete the file to re-create it.
+6. It then passes created answers to the Judge and returns each answers relevancy.
+7. Finally, to get a quick summary of the last judge run use `uv run python -m evaluation.agent_evaluation_simple --metrics-only` ->
+
+```bash
+run_date=2026-08-17T13:17:58-06:00
+eve_model=gpt-5.4-mini
+judge_model=gpt-5.4-mini
+relevance
+RELEVANT           0.7
+PARTLY_RELEVANT    0.3
+Name: proportion, dtype: float64
+```
+
+### 2. Vercel Eve evals
+
+Since we are using Vercels Eve package, we have access to a more complete evals platform, see [https://eve.dev/docs/evals/overview](https://eve.dev/docs/evals/overview)
+
+- I've created a few basic evals in `bernalillo-water-rag-agent/evals/`:
+  - `smoke`: one cheap in-scope question (where tap water comes from). Checks `knowledge__search` and a citation.
+  - `narrative`: CCR story questions from `evals/data/narrative.json` (source water, treatment, sampling). Expects search, not compliance lookup.
+  - `compliance`: measured-level questions from `evals/data/compliance.json`. Expects `knowledge__lookup_compliance` and the right ppb values.
+  - `definition`: contaminant name / units / source from `evals/data/definition.json`. Expects `knowledge__lookup_contaminant_info`.
+  - `refusal`: out-of-scope questions (a specific house, another city). Should refuse and not call tools.
+  - `year-clarify`: yearless arsenic question. First turn should ask which year; second turn (sample year 2025) should look up compliance and say 0 ppb.
+
+- To run the evals (FastAPI on `:8000` must be up so the knowledge tools work):
+
+```bash
+cd bernalillo-water-rag-agent
+pnpm exec eve eval              # all evals
+pnpm exec eve eval smoke        # one suite
+pnpm exec eve eval --list       # print ids without running
+```
+
+If Eve logs `[world-local] Queue delivery failed ... TypeError: fetch failed`, stop Eve and delete `bernalillo-water-rag-agent/.eve/.workflow-data`. **Warning** - **This will remove your local sessions. Don't do this if you still need those.** That is Eve's local durable-run store. Crashed sessions stay `running` and get re-queued on every boot. Eve recreates the folder.
+
 
 ## Interface
 
