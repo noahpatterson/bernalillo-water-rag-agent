@@ -18,6 +18,5 @@ node_modules
 .output
 models
 data/raw
-grafana
 *.pem
 .DS_Store

@@ -24,7 +24,7 @@ This RAG tool lets a resident ask in plain language and get an answer grounded i
 - **Embeddings:** Xenova all-MiniLM-L6-v2 via ONNX Runtime
 - **Agent / UI:** Eve + Next.js chat; OpenAI for the LLM; tools via FastAPI OpenAPI
 - **Ingest:** PyMuPDF / pymupdf4llm for CCR PDFs; hand-curated compliance CSV
-- **Ops:** Docker Compose, Grafana, uv, Ruff, Black
+- **Ops:** Docker Compose, uv, Ruff, Black
 
 ## Project prep
 
@@ -72,7 +72,7 @@ docker compose -f docker-compose.example.yml up -d --build
 uv run python db/init/db_init.py
 ```
 
-Compose starts Postgres, Grafana (`http://localhost:3001`), FastAPI (`http://localhost:8000`), and the Eve + Next.js chat (`http://localhost:3000`). The Eve knowledge connection uses that FastAPI origin. Mount `models/` into the API container (see step 4) before the first `up`.
+Compose starts Postgres, FastAPI (`http://localhost:8000`), and the Eve + Next.js chat (`http://localhost:3000`). The Eve knowledge connection uses that FastAPI origin. Mount `models/` into the API container (see step 4) before the first `up`.
 
 ### 4. Embedding model
 
@@ -199,13 +199,11 @@ Residents use the Eve Next.js chat at [http://localhost:3000](http://localhost:3
 
 The machine interface is FastAPI at [http://localhost:8000](http://localhost:8000) (`/search`, `/lookup_compliance`, `/lookup_contaminant_info`, `/health`, OpenAPI at `/openapi.json`).
 
-### TODO: Why Eve (draft)
+### Why Eve
 
-The interesting work in this project is retrieval, ingest, and eval, not another chat stack. Eve already has a Next.js web chat, a terminal UI, streaming, session state, and tool-call rendering. Rolling that myself would mean owning the LLM loop, function-calling, and UI for little extra learning.
+This project focuses on retrieval, ingest, and eval. Eve already has a Next.js web chat, a terminal UI, streaming, session state, and tool-call rendering. While building a web chat from scratch is a worthy goal, I wanted to focus my time on the core RAG internals. 
 
-The `knowledge` OpenAPI connection is the other reason. FastAPI already exposes `/search`, `/lookup_compliance`, and `/lookup_contaminant_info`. Eve reads `/openapi.json` and turns those routes into `knowledge__*` operations after one `connection_search`. I did not want a second, hand-written tool schema next to the API.
-
-Tradeoff to revisit: Eve is another runtime (now in Compose next to FastAPI), first-turn discovery is ceremony, and model choice is whatever Eve's OpenAI provider supports. If the course writeup needs "I built the agent loop," this is the section to replace or defend.
+Eve adds another layer of learning as well. Integrating with Eve, building Next.js as the frontend for Eve, my custom tools, building custom Eve evals, and using a third-party monitoring service are skills in themselves. This shows how I not only understand RAG and how to build it, but also how to integrate with popular frameworks and tools.
 
 ## Ingestion pipeline
 
@@ -241,13 +239,9 @@ uv run python -m ingestion.ingest_pdfs
 
 Reads `data/raw/abcwua/SOURCE.txt`, strips table boxes from each page, splits the remaining narrative, embeds with MiniLM, and writes `knowledge_base_chunks` (used by `/search`). Each report year is deleted and re-inserted. A short compliance stub is added so search can point at the compliance tool instead of the raw table text.
 
-## Monitoring
-
-Placeholder
-
 ## Containerization
 
-`docker-compose.example.yml` runs the full stack: pgvector Postgres, Grafana on port 3001, the FastAPI image from `Dockerfile` on port 8000, and the Eve + Next.js image from `bernalillo-water-rag-agent/Dockerfile` on port 3000. The API container mounts `models/` read-only and talks to Postgres on the compose network. Eve calls FastAPI at `http://api.localhost:8000` on that same network.
+`docker-compose.example.yml` runs the full stack: pgvector Postgres, the FastAPI image from `Dockerfile` on port 8000, and the Eve + Next.js image from `bernalillo-water-rag-agent/Dockerfile` on port 3000. The API container mounts `models/` read-only and talks to Postgres on the compose network. Eve calls FastAPI at `http://api.localhost:8000` on that same network.
 
 Copy the example file to `docker-compose.yml` if you want a local override, then `docker compose up -d --build`. Open the chat at [http://localhost:3000](http://localhost:3000). Do not also run host `pnpm dev` while the Compose `eve` service is bound to port 3000.
 
