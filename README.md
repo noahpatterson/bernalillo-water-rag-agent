@@ -268,3 +268,9 @@ Traces go to [Arize AX](https://arize.com/) through Eve OpenTelemetry (`bernalil
 
 Copy the example file to `docker-compose.yml` if you want a local override, then `docker compose up -d --build`. Open the chat at [http://localhost:3000](http://localhost:3000). Do not also run host `pnpm dev` while the Compose `eve` service is bound to port 3000.
 
+## Contributing
+
+This is a course project. I am not accepting pull requests or new issues unless I ask for them.
+
+You can fork the repo and use it under the [MIT License](LICENSE).
+
