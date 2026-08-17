@@ -1,0 +1,30 @@
+[
+  {
+    "id": "source-water-2025",
+    "prompt": "Where does Albuquerque tap water come from? Use the 2025 water quality report.",
+    "expectTools": ["knowledge__search"],
+    "forbidTools": ["knowledge__lookup_compliance"],
+    "requireCitation": true,
+    "mustInclude": ["groundwater", "San Juan-Chama"],
+    "expected": "ABCWUA drinking water comes from local groundwater wells and San Juan-Chama surface water imported from the Colorado River basin.",
+    "criteria": "Names both groundwater and San Juan-Chama / surface water. Does not invent measured contaminant levels."
+  },
+  {
+    "id": "treatment-groundwater-2025",
+    "prompt": "How does ABCWUA treat groundwater before it reaches the tap? Use the 2025 report.",
+    "expectTools": ["knowledge__search"],
+    "forbidTools": ["knowledge__lookup_compliance"],
+    "requireCitation": true,
+    "mustInclude": ["arsenic"],
+    "expected": "Well water is treated, including extra treatment for arsenic, then chemically stabilized before distribution.",
+    "criteria": "Describes groundwater treatment from the CCR narrative. Does not quote an arsenic ppb unless that number appeared in search results."
+  },
+  {
+    "id": "sampling-2025",
+    "prompt": "How many drinking water samples does ABCWUA test each year, and who tests them? Use the 2025 report.",
+    "expectTools": ["knowledge__search"],
+    "requireCitation": true,
+    "expected": "The 2025 CCR states how many samples are collected and that testing is done by the listed lab / authority, not by the resident.",
+    "criteria": "Gives the sample-count and tester only if present in tool results. Does not guess a number."
+  }
+]

@@ -1,0 +1,48 @@
+[
+  {
+    "id": "arsenic-avg-2024",
+    "prompt": "What was the average arsenic level in Albuquerque drinking water in sample year 2024?",
+    "expectTools": ["knowledge__lookup_compliance"],
+    "forbidTools": [],
+    "requireCitation": true,
+    "mustInclude": ["2.5", "ppb"],
+    "expected": "In sample year 2024 the system-wide average arsenic was 2.5 ppb.",
+    "criteria": "Reports 2.5 ppb as the 2024 average. Does not use the 2025 arsenic average of 0."
+  },
+  {
+    "id": "arsenic-avg-2025-zero",
+    "prompt": "What was the average arsenic level in sample year 2025?",
+    "expectTools": ["knowledge__lookup_compliance"],
+    "requireCitation": true,
+    "mustInclude": ["0", "ppb"],
+    "expected": "The 2025 system-wide average arsenic was 0 ppb.",
+    "criteria": "States the average is 0 ppb. Does not substitute a typical national arsenic value."
+  },
+  {
+    "id": "lead-action-level-2025",
+    "prompt": "In the 2025 report, what was the lead 90th percentile and were any samples over the action level?",
+    "expectTools": ["knowledge__lookup_compliance"],
+    "requireCitation": true,
+    "mustInclude": ["15", "0"],
+    "expected": "Lead 90th percentile was 0 ppb, with 0 samples exceeding.",
+    "criteria": "Gives 0 ppb, can include 15 ppb action level, and zero exceedances. Does not give household-specific advice."
+  },
+  {
+    "id": "lead-action-level-2023",
+    "prompt": "In the 2023 report, what was the lead 90th percentile and were any samples over the action level?",
+    "expectTools": ["knowledge__lookup_compliance"],
+    "requireCitation": true,
+    "mustInclude": ["2", "15", "0"],
+    "expected": "Lead 90th percentile was 2 ppb, with 0 samples exceeding.",
+    "criteria": "Gives 2 ppb, can include 15 ppb action level, and zero exceedances. Does not give household-specific advice."
+  },
+  {
+    "id": "nitrate-2025",
+    "prompt": "What was the 2025 system-wide average nitrate, and what is the MCL?",
+    "expectTools": ["knowledge__lookup_compliance"],
+    "requireCitation": true,
+    "mustInclude": ["0.75", "10"],
+    "expected": "2025 average nitrate was 0.75 ppm. MCL is 10 ppm.",
+    "criteria": "Reports 0.75 and MCL 10 in ppm. Does not mix in the 2024 average of 0.38."
+  }
+]

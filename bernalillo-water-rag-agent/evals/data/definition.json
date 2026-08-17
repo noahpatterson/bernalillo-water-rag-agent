@@ -1,0 +1,20 @@
+[
+  {
+    "id": "arsenic-what-is",
+    "prompt": "What is arsenic in the water quality reports, what units is it reported in, and where does it come from?",
+    "expectTools": ["knowledge__lookup_contaminant_info"],
+    "requireCitation": true,
+    "mustInclude": ["ppb"],
+    "expected": "Arsenic (As) is reported in ppb. The listed source is erosion of natural volcanic deposits.",
+    "criteria": "Uses contaminant info (name/code/units/source). Does not invent a 2025 average unless lookup_compliance was also called."
+  },
+  {
+    "id": "uranium-units-source",
+    "prompt": "What units does the report use for uranium, and what is the listed source?",
+    "expectTools": ["knowledge__lookup_contaminant_info"],
+    "requireCitation": true,
+    "mustInclude": ["ppb"],
+    "expected": "Uranium is reported in ppb, source erosion of natural deposits.",
+    "criteria": "Answers units and source."
+  }
+]
