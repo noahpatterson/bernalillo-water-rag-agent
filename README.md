@@ -2,6 +2,9 @@
 
 LLM Zoomcamp project: ABCWUA Consumer Confidence Report water-quality Q&A (RAG + compliance-table tool).
 
+<img width="853" height="599" alt="Screenshot 2026-08-17 at 4 44 31 PM" src="https://github.com/user-attachments/assets/5267b8e0-0a3f-4c29-9cd1-352b129cba28" />
+
+
 ## Problem description
 
 Albuquerque Bernalillo County Water Utility Authority (ABCWUA) publishes yearly Consumer Confidence Reports. Those PDFs answer common questions (is my tap water safe, where it comes from, lead, arsenic, PFAS) but they are long, split across years, and mix narrative with compliance tables.
