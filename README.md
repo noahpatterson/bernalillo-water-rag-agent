@@ -207,7 +207,37 @@ Tradeoff to revisit: Eve is another runtime (not in Compose), first-turn discove
 
 ## Ingestion pipeline
 
-Placeholder
+Postgres tables (`uv run python db/init/db_init.py`) and the MiniLM files under `models/` must exist first. Run these from the repo root.
+
+### 1. Download raw CCR PDFs
+
+PDFs are not in git. Pull the 2020-2025 ABCWUA mailers from the URLs in `data/raw/abcwua/SOURCE.txt`:
+
+```bash
+uv run python scripts/download_raw_ccr.py
+```
+
+That writes `data/raw/abcwua/ABCWUA-CCR-2020.pdf` … `2025.pdf`. Re-run with `--force` to replace files that already exist.
+
+### 2. Load the hand-compiled compliance CSV
+
+The mailer PDFs put **COMPLIANCE MONITORING RESULTS** in multi-column tables that do not extract cleanly. Those rows were typed and spot-checked by hand into `data/processed/abcwua/CCR_Compliance_Results.csv` (committed; see `data/processed/abcwua/SOURCE.txt`). The script does not scrape the PDFs.
+
+Load the CSV into `compliance_results` (used by `lookup_compliance` and `lookup_contaminant_info`):
+
+```bash
+uv run python -m ingestion.ingest_contaminant_data
+```
+
+If the rows are already present, the insert is skipped.
+
+### 3. Chunk and embed the PDFs
+
+```bash
+uv run python -m ingestion.ingest_pdfs
+```
+
+Reads `data/raw/abcwua/SOURCE.txt`, strips table boxes from each page, splits the remaining narrative, embeds with MiniLM, and writes `knowledge_base_chunks` (used by `/search`). Each report year is deleted and re-inserted. A short compliance stub is added so search can point at the compliance tool instead of the raw table text.
 
 ## Monitoring
 

@@ -1,10 +1,12 @@
 import datetime
+import os
+
 import psycopg
 import pymupdf4llm
-from utils.utils import create_connection
-import os
-from embedder import Embedder
 from tokenizers import Tokenizer
+
+from embedder import Embedder
+from utils.utils import create_connection
 
 
 def read_pdf_to_json(pdf_path: str) -> dict:

@@ -1,7 +1,9 @@
 import csv
-from typing import Iterable, TypeVar
-import psycopg
 from dataclasses import dataclass
+from typing import Iterable, TypeVar
+
+import psycopg
+
 from utils.utils import create_connection
 
 SOURCE_URLS: dict[int, str] = {
