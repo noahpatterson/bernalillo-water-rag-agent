@@ -2,7 +2,8 @@
 #   docker compose -f docker-compose.example.yml up --build
 #
 # Serves FastAPI at http://localhost:8000 (OpenAPI at /openapi.json).
-# The Eve agent on the host talks to that URL.
+# Serves Eve + Next.js chat at http://localhost:3000.
+# Grafana is on http://localhost:3001.
 
 configs:
   grafana-datasource:
@@ -77,6 +78,12 @@ services:
       ]
     ports:
       - '${API_PORT:-8000}:8000'
+    networks:
+      default:
+        # Eve only allows http:// for *.localhost hostnames. This alias lets
+        # the eve container fetch OpenAPI over HTTP on the compose network.
+        aliases:
+          - api.localhost
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: '5432'
@@ -90,7 +97,6 @@ services:
       - ./utils:/app/utils
       - ./tools:/app/tools
       - ./models:/app/models:ro
-      - ./.eve/.workflow-data:/app/.eve/.workflow-data
     depends_on:
       postgres:
         condition: service_healthy
@@ -106,6 +112,36 @@ services:
       timeout: 5s
       retries: 12
       start_period: 40s
+
+  eve:
+    build: ./bernalillo-water-rag-agent
+    ports:
+      - '${EVE_PORT:-3000}:3000'
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_MODEL_DEV: ${OPENAI_MODEL_DEV:-gpt-5.4-mini}
+      OPENAI_MODEL_STRONG: ${OPENAI_MODEL_STRONG:-}
+      OPENAI_MODEL_TIER: ${OPENAI_MODEL_TIER:-dev}
+      # Hardcoded so a host-oriented value in .env cannot break in-network calls.
+      KNOWLEDGE_API_BASE_URL: http://api.localhost:8000
+      EVE_ALLOW_ANONYMOUS: '1'
+    volumes:
+      - ./bernalillo-water-rag-agent/.eve/.workflow-data:/app/.eve/.workflow-data
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/eve/v1/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
 
 volumes:
   pgdata:

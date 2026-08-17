@@ -1,5 +1,10 @@
 import { eveChannel } from "eve/channels/eve";
-import { localDev, placeholderAuth, vercelOidc } from "eve/channels/auth";
+import { localDev, none, placeholderAuth, vercelOidc } from "eve/channels/auth";
+
+// Compose sets EVE_ALLOW_ANONYMOUS=1 so the production Next.js image can
+// serve the chat without a real identity provider. Host `pnpm dev` still
+// uses localDev() and does not need this flag.
+const allowAnonymous = process.env.EVE_ALLOW_ANONYMOUS === "1";
 
 export default eveChannel({
   auth: [
@@ -10,6 +15,6 @@ export default eveChannel({
     // This placeholder will not allow browser requests in production.
     // Replace it with your app's auth provider, like Auth.js or Clerk,
     // or use none() for a public demo.
-    placeholderAuth(),
+    allowAnonymous ? none() : placeholderAuth(),
   ],
 });

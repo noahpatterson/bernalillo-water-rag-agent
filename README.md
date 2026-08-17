@@ -72,7 +72,7 @@ docker compose -f docker-compose.example.yml up -d --build
 uv run python db/init/db_init.py
 ```
 
-Compose starts Postgres, Grafana (`http://localhost:3001`), and FastAPI (`http://localhost:8000`). The Eve knowledge connection uses that FastAPI origin. Mount `models/` into the API container (see step 4) before the first `up`.
+Compose starts Postgres, Grafana (`http://localhost:3001`), FastAPI (`http://localhost:8000`), and the Eve + Next.js chat (`http://localhost:3000`). The Eve knowledge connection uses that FastAPI origin. Mount `models/` into the API container (see step 4) before the first `up`.
 
 ### 4. Embedding model
 
@@ -80,7 +80,9 @@ Place / download the Zoomcamp ONNX MiniLM under `models/` (gitignored). See `.en
 
 ### 5. Eve chat UI
 
-The browser chat is Eve's official Next.js Web Chat starter, colocated with the agent in `bernalillo-water-rag-agent/`.
+The browser chat is Eve's official Next.js Web Chat starter, colocated with the agent in `bernalillo-water-rag-agent/`. Compose builds and starts it on [http://localhost:3000](http://localhost:3000) with the rest of the stack. Set `OPENAI_API_KEY` in the repo-root `.env` before `docker compose up`.
+
+For live Next.js / Eve development on the host instead of the container, stop the compose `eve` service first (port 3000) and run:
 
 ```bash
 cd bernalillo-water-rag-agent
@@ -89,7 +91,7 @@ pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). `pnpm dev` runs Next.js and Eve together. Use `pnpm dev:eve` if you only want Eve's terminal UI.
+`pnpm dev` runs Next.js and Eve together. Use `pnpm dev:eve` if you only want Eve's terminal UI.
 
 ## Retrieval flow
 
@@ -97,7 +99,7 @@ CCR narrative search is the FastAPI `GET /search` tool. Eve sends the user quest
 
 ### Eve operations
 
-Eve talks to FastAPI through the `knowledge` OpenAPI connection (`bernalillo-water-rag-agent/agent/connections/knowledge.ts`). The spec is `http://127.0.0.1:8000/openapi.json`.
+Eve talks to FastAPI through the `knowledge` OpenAPI connection (`bernalillo-water-rag-agent/agent/connections/knowledge.ts`). On the host the spec is `http://127.0.0.1:8000/openapi.json`. Inside Compose it is `http://api.localhost:8000/openapi.json` (Docker DNS alias; Eve only allows `http://` for `*.localhost` hosts).
 
 On the first turn the agent calls Eve `connection_search` once with `search lookup_compliance lookup_contaminant_info`. That unlocks the qualified tools `knowledge__search`, `knowledge__lookup_compliance`, and `knowledge__lookup_contaminant_info`. Later turns reuse them. `agent/instructions.md` tells the model to call `knowledge__search` once per question, add the other tools when the question needs numbers or EPA context, and answer only from those results.
 
@@ -150,7 +152,7 @@ uv run python -m evaluation.agent_evaluation_simple \
 
 What it does:
 1. The script either uses default variables from main, or specific args you pass
-2. NOTE: you'll likely need to pass the Eve server url that starts when you run `pnpm run dev` to `--eve-host`
+2. `--eve-host` defaults to `http://127.0.0.1:3000` (the Compose Eve service, or host `pnpm dev`). Override it if you changed `EVE_PORT` or set `EVE_HOST` in `.env`.
 3. NOTE: If you've changed the defaut Eve model in .env `OPENAI_MODEL_DEV` pass `--eve-model` with your model.
 4. It uses the specific Eve Model and Judge Model you pass.
 5. If the script sees an existing Eve generated evaluation data file e.g. `evaluation/agent_evaluation_data_gpt_5_4_mini.csv` then it skips re-creating those Eve answers. Delete the file to re-create it.
@@ -179,7 +181,7 @@ Since we are using Vercels Eve package, we have access to a more complete evals 
   - `refusal`: out-of-scope questions (a specific house, another city). Should refuse and not call tools.
   - `year-clarify`: yearless arsenic question. First turn should ask which year; second turn (sample year 2025) should look up compliance and say 0 ppb.
 
-- To run the evals (FastAPI on `:8000` must be up so the knowledge tools work):
+- To run the evals (FastAPI on `:8000` and Eve on `:3000` must be up so the knowledge tools and judge target work):
 
 ```bash
 cd bernalillo-water-rag-agent
@@ -193,7 +195,7 @@ If Eve logs `[world-local] Queue delivery failed ... TypeError: fetch failed`, s
 
 ## Interface
 
-Residents use the Eve Next.js chat in `bernalillo-water-rag-agent/` at [http://localhost:3000](http://localhost:3000). Type a water-quality question; the agent calls the FastAPI tools and answers in the thread. Tool calls show up in the message stream. `pnpm dev:eve` is the same agent in Eve's terminal UI.
+Residents use the Eve Next.js chat at [http://localhost:3000](http://localhost:3000) (the Compose `eve` service, or host `pnpm dev`). Type a water-quality question; the agent calls the FastAPI tools and answers in the thread. Tool calls show up in the message stream. `pnpm dev:eve` is the same agent in Eve's terminal UI.
 
 The machine interface is FastAPI at [http://localhost:8000](http://localhost:8000) (`/search`, `/lookup_compliance`, `/lookup_contaminant_info`, `/health`, OpenAPI at `/openapi.json`).
 
@@ -203,7 +205,7 @@ The interesting work in this project is retrieval, ingest, and eval, not another
 
 The `knowledge` OpenAPI connection is the other reason. FastAPI already exposes `/search`, `/lookup_compliance`, and `/lookup_contaminant_info`. Eve reads `/openapi.json` and turns those routes into `knowledge__*` operations after one `connection_search`. I did not want a second, hand-written tool schema next to the API.
 
-Tradeoff to revisit: Eve is another runtime (not in Compose), first-turn discovery is ceremony, and model choice is whatever Eve's OpenAI provider supports. If the course writeup needs "I built the agent loop," this is the section to replace or defend.
+Tradeoff to revisit: Eve is another runtime (now in Compose next to FastAPI), first-turn discovery is ceremony, and model choice is whatever Eve's OpenAI provider supports. If the course writeup needs "I built the agent loop," this is the section to replace or defend.
 
 ## Ingestion pipeline
 
@@ -245,7 +247,7 @@ Placeholder
 
 ## Containerization
 
-`docker-compose.example.yml` runs the backend stack: pgvector Postgres, Grafana on port 3001, and the FastAPI image from `Dockerfile` on port 8000. The API container mounts `models/` read-only and talks to Postgres on the compose network.
+`docker-compose.example.yml` runs the full stack: pgvector Postgres, Grafana on port 3001, the FastAPI image from `Dockerfile` on port 8000, and the Eve + Next.js image from `bernalillo-water-rag-agent/Dockerfile` on port 3000. The API container mounts `models/` read-only and talks to Postgres on the compose network. Eve calls FastAPI at `http://api.localhost:8000` on that same network.
 
-Eve and the Next.js chat stay on the host (`pnpm dev`) and call `http://127.0.0.1:8000`. They are not in Compose. Copy the example file to `docker-compose.yml` if you want a local override, then `docker compose up -d --build`.
+Copy the example file to `docker-compose.yml` if you want a local override, then `docker compose up -d --build`. Open the chat at [http://localhost:3000](http://localhost:3000). Do not also run host `pnpm dev` while the Compose `eve` service is bound to port 3000.
 

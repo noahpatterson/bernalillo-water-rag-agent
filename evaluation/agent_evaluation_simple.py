@@ -278,10 +278,10 @@ def main(
 ) -> Path:
     """Collect Eve answers with ``eve_model`` and judge them with ``judge_model``.
 
-    Eve itself is whatever model the running ``pnpm dev`` process was started
-    with (``OPENAI_MODEL_DEV``). Pass ``eve_model`` to label the data and
-    results for that run. Restart Eve with a different ``OPENAI_MODEL_DEV``
-    to generate answers from another model.
+    Eve itself is whatever model the running Compose ``eve`` service (or host
+    ``pnpm dev``) was started with (``OPENAI_MODEL_DEV``). Pass ``eve_model``
+    to label the data and results for that run. Restart Eve with a different
+    ``OPENAI_MODEL_DEV`` to generate answers from another model.
     """
     if metrics_only:
         print_last_run_metrics(results_path)

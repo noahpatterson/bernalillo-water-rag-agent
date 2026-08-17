@@ -1,0 +1,10 @@
+node_modules
+.next
+.output
+.eve
+.env
+.env.*
+!.env.example
+*.md
+tsconfig.tsbuildinfo
+.DS_Store
