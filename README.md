@@ -121,12 +121,17 @@ Postgres and the MiniLM model from the steps above must be available. From the r
 uv run python -m evaluation.retrieval_evaluation
 ```
 
-Each run appends one row per method to `evaluation/retrieval_evaluation_results.csv`, keyed by `run_date`:
+Each run appends one row per method to `evaluation/retrieval_evaluation_results.csv`, keyed by `run_date`. Latest 2025 scores:
 
 ```text
-run_date,method,report_year,hit_rate,mrr
-2026-08-14T18:21:57-06:00,pgvector_search,2025,0.94,0.72
+method                         hit_rate  mrr
+pgvector_search                0.94      0.72
+pg_full_text_search            0.22      0.21
+pg_full_text_search_soft_match 0.88      0.70
+rrf                            0.95      0.77
 ```
+
+RRF is the best of the four, so live `GET /search` uses it (vector + soft full-text, fused).
 
 ### Ground-truth generation
 
@@ -199,6 +204,15 @@ If Eve logs `[world-local] Queue delivery failed ... TypeError: fetch failed`, s
 
 Residents use the Eve Next.js chat at [http://localhost:3000](http://localhost:3000) (the Compose `eve` service, or host `pnpm dev`). Type a water-quality question; the agent calls the FastAPI tools and answers in the thread. Tool calls show up in the message stream. `pnpm dev:eve` is the same agent in Eve's terminal UI.
 
+Example:
+
+```text
+Q: Where does Albuquerque tap water come from?
+A: A mix of locally pumped groundwater and San Juan-Chama Project
+   surface water (Heron, El Vado, Abiquiu).
+   Source: 2022 ABCWUA Water Quality Report
+```
+
 The machine interface is FastAPI at [http://localhost:8000](http://localhost:8000) (`/search`, `/lookup_compliance`, `/lookup_contaminant_info`, `/health`, OpenAPI at `/openapi.json`).
 
 ### Why Eve
@@ -243,7 +257,7 @@ Reads `data/raw/abcwua/SOURCE.txt`, strips table boxes from each page, splits th
 
 ## Monitoring
 
-I choose to use []() for monitoring as Eve allows for easy integration of OpenTelemetry data (traces, agent runs, etc.). In the future I hope to add a simple local example where I add Grafana as another example source for the Eve OpenTelemetry data.
+Traces go to [Arize AX](https://arize.com/) through Eve OpenTelemetry (`bernalillo-water-rag-agent/agent/instrumentation.ts`). Set `ARIZE_SPACE_ID` and `ARIZE_API_KEY` in `bernalillo-water-rag-agent/.env.local`. Compose loads that file into the `eve` service. After a chat turn, open Arize and look at project `bernalillo-water-rag-agent` (or `ARIZE_PROJECT_NAME` if you set one).
 
 ## Containerization
 
