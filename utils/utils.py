@@ -1,10 +1,13 @@
 from contextlib import contextmanager
 from enum import StrEnum
 import os
+from pathlib import Path
 
+import pandas as pd
 import psycopg
 from dotenv import load_dotenv
 from pgvector.psycopg import register_vector
+from typing import TypedDict, cast
 
 load_dotenv()
 
@@ -66,3 +69,18 @@ class ContaminantValueDescriptions(StrEnum):
     MAXIMUM_CONTAMINANT_LEVEL_GOAL = "Maximum contaminant level goal"
     NUM_SAMPLES_EXCEEDING_ACTION_LEVEL = "Number of samples exceeding action level"
     ACTION_LEVEL = "Action level"
+
+# Ground truth loading
+DEFAULT_GROUND_TRUTH = Path("data/processed/search_ground_truth.csv")
+
+
+class GroundTruthQuery(TypedDict):
+    question: str
+    document: int
+
+def load_ground_truth(
+    path: str | Path = DEFAULT_GROUND_TRUTH,
+) -> list[GroundTruthQuery]:
+    """Load one {question, document} row per ground-truth question."""
+    df = pd.read_csv(path)
+    return cast(list[GroundTruthQuery], df.to_dict(orient="records"))

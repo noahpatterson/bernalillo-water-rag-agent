@@ -8,16 +8,19 @@ appears anywhere in the top-k list. MRR is the mean of 1/rank of that chunk.
 from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
-from typing import TypedDict, cast
 
 import pandas as pd
 from tqdm.auto import tqdm
 
 from embedder import Embedder
 from tools.retrieval import FusedHit, Retrieval, SearchHit
-from utils.utils import get_connection
+from utils.utils import (
+    DEFAULT_GROUND_TRUTH,
+    GroundTruthQuery,
+    get_connection,
+    load_ground_truth,
+)
 
-DEFAULT_GROUND_TRUTH = Path("data/processed/search_ground_truth.csv")
 DEFAULT_EMBEDDER_PATH = "models/Xenova/all-MiniLM-L6-v2"
 DEFAULT_RESULTS_CSV = Path("evaluation/retrieval_evaluation_results.csv")
 SINGLE_SEARCH_METHODS = (
@@ -25,19 +28,6 @@ SINGLE_SEARCH_METHODS = (
     "pg_full_text_search",
     "pg_full_text_search_soft_match",
 )
-
-
-class GroundTruthQuery(TypedDict):
-    question: str
-    document: int
-
-
-def load_ground_truth(
-    path: str | Path = DEFAULT_GROUND_TRUTH,
-) -> list[GroundTruthQuery]:
-    """Load one {question, document} row per ground-truth question."""
-    df = pd.read_csv(path)
-    return cast(list[GroundTruthQuery], df.to_dict(orient="records"))
 
 
 def hit_id(result: SearchHit | FusedHit) -> int:
